@@ -23,6 +23,8 @@
 	<li>ICMPv6</li>
 </ul>
 
+<p>具体怎么实现的参考这里：<a href="https://github.com/pandax381/xv6-net">xv6-net</a></p>
+
 <h3>以下为XV64原版readme</h3>
 
 ----------
