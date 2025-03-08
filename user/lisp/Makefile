@@ -7,7 +7,7 @@ OBJDUMP = $(TOOLPREFIX)objdump
 
 XFLAGS = -Werror -m64 -DX64 -mcmodel=kernel -mtls-direct-seg-refs -mno-red-zone
 
-LDFLAGS = -m elf_x86_64 -nodefaultlibs
+LDFLAGS = -m elf_x86_64 -z nodefaultlib
 OPT ?= -O0
 
 CFLAGS = -I ../../include/unix/ -fno-canonical-system-headers -Wno-builtin-declaration-mismatch -c

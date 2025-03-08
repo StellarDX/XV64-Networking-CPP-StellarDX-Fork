@@ -9,6 +9,8 @@
 #include "spinlock.h"
 #include "irq.h"
 
+#include "UNetworkAdapter.hh"
+
 // Interrupt descriptor table (shared by all CPUs).
 struct gatedesc idt[256];
 extern uintp vectors[];  // in vectors.S: array of 256 entry pointers
@@ -77,6 +79,11 @@ void trap(struct trapframe* tf){
 		lapiceoi();
 		break;
 
+    case T_IRQ0 + Intel8254xInterruptCode:
+        Intel8254xInterrupt();
+        lapiceoi();
+        break;
+
 	default:
 		amd64_nop(); // a label can only appear directly in front of a statement, so...
 		void (*dynamicIrqHandler)(uint16) = get_registered_handler(tf->trapno);
@@ -92,7 +99,7 @@ void trap(struct trapframe* tf){
 			}else{
 				cprintf("unexpected trap %d from cpu %d eip %x (cr2=0x%x)\n",
 				        tf->trapno, cpu->id, tf->eip, rcr2());
-				panic("trap");
+                panic("trap");
 			}
 		} else {
 			// In user space, assume process misbehaved.

@@ -13,3 +13,13 @@ out
 .DS_Store
 bin/**/*
 fs/**/*
+
+# Qt Creator files
+.qtc_clangd
+*.cflags
+*.config
+*.creator
+*.user
+*.cxxflags
+*.files
+*.includes

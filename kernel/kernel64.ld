@@ -17,13 +17,20 @@ SECTIONS
 	PROVIDE(begin = .);
 
 	.text : AT(mboot_load_addr) {
-		*(.text .rela.text .stub .text.* .gnu.linkonce.t.*)
-	}
+                *(.text .rela.text .stub .text.* .gnu.linkonce.t.*)
+        }
 
-	PROVIDE(etext = .);	/* Define the 'etext' symbol to this value */
+        PROVIDE(etext = .);	/* Define the 'etext' symbol to this value */
 
-	.rodata : {
-		*(.rodata .rodata.* .gnu.linkonce.r.*)
+        .rodata BLOCK(4K) : ALIGN(4K)
+        {
+            *(.ctors_begin)
+            *(.ctors)
+            *(.ctors_end)
+            *(.dtors_begin)
+            *(.dtors)
+            *(.dtors_end)
+            *(.rodata .rodata.* .gnu.linkonce.r.*)
 	}
 
 	/* Adjust the address for the data segment to the next page */
@@ -39,25 +46,25 @@ SECTIONS
 
 	/* The data segment */
 	.data : {
-		*(.data)
+                *(.data)
 	}
 
-	. = ALIGN(0x1000);
+        . = ALIGN(0x1000);
 
 	PROVIDE(edata = .);
 
 	.bss : {
 		*(.bss)
-		*(COMMON)
+                *(COMMON)
 	}
 
-	. = ALIGN(0x1000);
+        . = ALIGN(0x1000);
 
 	PROVIDE(end = .);
 
 	/DISCARD/ : {
-		*(.eh_frame .rela.eh_frame .note.GNU-stack)
-	}
+                *(.eh_frame .rela.eh_frame .note.GNU-stack)
+        }
 }
 
 mboot_load_end = mboot_load_addr + (edata - begin);

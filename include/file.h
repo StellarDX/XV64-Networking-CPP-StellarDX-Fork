@@ -1,11 +1,20 @@
+#ifndef __FILE_H
+#define __FILE_H
+
 struct file {
-  enum { FD_NONE, FD_PIPE, FD_INODE } type;
+  enum { FD_NONE, FD_PIPE, FD_INODE, FD_SOCKET } type;
   int ref; // reference count
   char readable;
   char writable;
   struct pipe *pipe;
   struct inode *ip;
   uint off;
+
+  struct SocketInfo
+  {
+      int Type;
+      int Desc;
+  }Socket;
 };
 
 
@@ -44,3 +53,5 @@ struct pollfd {
     short events;     /* requested events */
     short revents;    /* returned events */
 };
+
+#endif

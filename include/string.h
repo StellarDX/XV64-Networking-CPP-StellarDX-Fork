@@ -15,3 +15,4 @@ char* strcpy(char *s, char *t);
 char* strcat_s(char *dest, char *right, int max_len);
 int atoi(const char *s);
 char* strstr(const char *str1, char *str2);
+long ustrtol(const char *s, char **endptr, int base);

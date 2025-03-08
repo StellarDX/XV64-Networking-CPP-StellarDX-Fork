@@ -28,7 +28,7 @@ if [ -n "$EXT2" ]; then
     ROOT_IMG="fs-ext2.img"
 fi
 
-NETWORK="-net none"
+NETWORK="-nic tap,model=e1000"
 BOOT_DISK="-hda ./bin/boot.vdi"
 ROOT_DISK="-drive id=disk,file=./bin/$ROOT_IMG,if=none -device driver=ide-hd,drive=disk,bus=ahci.0"
 
@@ -40,4 +40,8 @@ if [ -n "$BIG" ]; then
     CPU="-cpu IvyBridge-v2 -smp sockets=2 -smp cores=12 -smp threads=2"
 fi
 
-qemu-system-x86_64 $QEMU_OPTS $DEBUG_OPTS -device ahci,id=ahci $CPU -m 512 $NETWORK $BOOT_DISK $ROOT_DISK
+source startbr.sh
+
+qemu-system-x86_64 $QEMU_OPTS $DEBUG_OPTS -device ahci,id=ahci $CPU -m 1500 $NETWORK $BOOT_DISK $ROOT_DISK
+
+source stopbr.sh

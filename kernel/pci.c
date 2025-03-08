@@ -6,6 +6,9 @@
 #include "ahci.h"
 #include "kernel/string.h"
 
+// StellarDX Headers
+#include "UNetworkAdapter.hh"
+
 #define	PCI_CLASS_BRIDGE 0x06
 #define	PCI_SUBCLASS_BRIDGE_PCI 0x04
 
@@ -14,7 +17,7 @@
 
 // Flag to do "lspci" at bootup
 static int pci_show_devs = 1;
-static int pci_show_addrs = 0;
+static int pci_show_addrs = 1;
 
 // PCI "configuration mechanism one"
 static uint32 pci_conf1_addr_ioport = 0x0cf8;
@@ -38,7 +41,6 @@ struct pci_driver pci_attach_class[] = {
 // pci_attach_vendor matches the vendor ID and device ID of a PCI device. key1
 // and key2 should be the vendor ID and device ID respectively
 struct pci_driver pci_attach_vendor[] = {
-	//{ 0x8086, 0x100e, &e1000_init },
 	{ 0, 0, 0 },
 };
 
@@ -104,6 +106,9 @@ static void pci_try_attach(struct pci_func *f){
 	case PCI_DEV_CLASS_BRIDGE:
 		pci_attach_storage_dev(f);
 		break;
+    case PCI_DEV_CLASS_NETWORKING:
+        NetworkAdapterSetup(f);
+        break;
 	default:
 		//non-supported/unknown device
 		pci_fallback_attach(f);         //one last ditch attempt
@@ -255,7 +260,7 @@ void pci_func_enable(struct pci_func* f){
 			        regnum, base, size);
 	}
 
-	cprintf("PCI function %02x:%02x.%d (%04x:%04x) enabled\n",
+    cprintf("PCI function %x:%x.%d (%x:%x) enabled\n",
 	        f->bus->busno, f->dev, f->func,
 	        PCI_VENDOR(f->dev_id), PCI_PRODUCT(f->dev_id));
 }
@@ -269,5 +274,5 @@ static int pci_init(void){
 
 void pciinit(void) {
 	cprintf("probing PCI...\n");
-	(void)pci_init();
+    (void)pci_init();
 }

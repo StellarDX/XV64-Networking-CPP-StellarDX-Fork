@@ -38,3 +38,22 @@
 #define SYS_cpuhalt       37
 #define SYS_getpriority   38
 #define SYS_setpriority   39
+
+#define SYS_ARPRequest    40
+#define SYS_SetIPAddress  41
+#define SYS_ShowIPAddress 42
+#define SYS_PrintARPTable 43
+#define SYS_DelIPAddress  44
+#define SYS_RTAddStatic   45
+#define SYS_RTPrint       46
+#define SYS_RTDelete      47
+#define SYS_Ping          48
+
+#define SYS_socket        50
+#define SYS_bind          51
+#define SYS_listen        52
+#define SYS_accept        53
+#define SYS_socksend      54
+#define SYS_sockrecv      55
+#define SYS_sockrecvfrom  56
+#define SYS_socksendto    57

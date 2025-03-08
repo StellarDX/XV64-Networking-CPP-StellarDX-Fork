@@ -9,6 +9,8 @@
 #include "file.h"
 #include "spinlock.h"
 
+#include "USocket.hh"
+
 struct devsw devsw[NDEV];
 struct {
 	struct spinlock lock;
@@ -69,6 +71,10 @@ void fileclose(struct file* f){
 		iput(ff.ip);
 		end_op();
 	}
+    else if (ff.type == FD_SOCKET)
+    {
+        DestorySocket(&ff);
+    }
 }
 
 // Get metadata about file f.
@@ -96,6 +102,10 @@ int fileread(struct file* f, char* addr, int n){
 		iunlock(f->ip);
 		return r;
 	}
+    if (f->type == FD_SOCKET)
+    {
+        return SocketRead(f, addr, n);
+    }
 	panic("fileread");
 }
 
@@ -150,5 +160,9 @@ int filewrite(struct file* f, char* addr, int n){
 		}
 		return i == n ? n : -1;
 	}
+    if (f->type == FD_SOCKET)
+    {
+        SocketWrite(f, addr, n);
+    }
 	panic("filewrite");
 }

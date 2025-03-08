@@ -101,7 +101,7 @@ void ahci_try_setup_known_device(char *dev_name, uint64 ahci_base_mem, uint16 bu
 			uint64 ssts = hba_port->ssts;
 
 			uint8 ipm = (ssts >> 8) & 0x0F;
-			uint8 spd = (ssts >> 4) & 0x0F;
+            uint8 spd = (ssts >> 4) & 0x0F;
 			uint8 det = ssts & 0x7; //the Device Detection (DET) flags are the bottom 3 bits
 
 			if (det != HBA_PORT_DET_PRESENT && ipm != HBA_PORT_IPM_ACTIVE) {
@@ -113,9 +113,9 @@ void ahci_try_setup_known_device(char *dev_name, uint64 ahci_base_mem, uint16 bu
 			}else if(hba_port->sig==SATA_SIG_PM) {
 				//port multiplier detected
 			}else{
-				cprintf("SATA device detected:\n");
-				cprintf("   port[%d].sig = %x\n", i, hba_port->sig);
-				cprintf("   ipm=%x, spd=%x, det=%x\n", ipm, spd, det);
+                cprintf("SATA device detected:\n");
+                cprintf("   port[%d].sig = %x\n", i, hba_port->sig);
+                cprintf("   ipm=%x, spd=%x, det=%x\n", ipm, spd, det);
 				ahci_sata_init(hba_port, i);
 			}
 		}

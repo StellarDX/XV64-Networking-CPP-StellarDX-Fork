@@ -10,6 +10,9 @@
 #include "buf.h"
 #include "kernel/string.h"
 
+#include "CXXInit.h"
+#include "UProtocols.hh"
+
 static void identcpu();
 static void credits();
 static void startothers(void);
@@ -27,6 +30,7 @@ extern char end[]; // first address after kernel loaded from ELF file
 // Allocate a real stack and switch to it, first
 // doing some setup required for memory allocator to work.
 int main(void){
+    CXXInit();
 	identcpu();
 	uartearlyinit();
 	kinit1(P2V(KALLOC_START), P2V(KALLOC_START + 4 * 1024 * 1024)); // phys page allocator
@@ -62,8 +66,11 @@ int main(void){
 	kinit2(P2V(KALLOC_START + 4 * 1024 * 1024), P2V(PHYSTOP)); // must come after startothers()
 	userinit(); // first user process
 
+    // Register network protocols
+    RegisterProtocols();
+
 	// Finish setting up this processor in mpmain.
-	mpmain();
+    mpmain();
 }
 
 void credits(){

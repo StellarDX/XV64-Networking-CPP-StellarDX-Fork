@@ -1,6 +1,8 @@
 #ifndef XV64_PCI_H
 #define XV64_PCI_H
 
+#include "UDef.hh"
+
 // PCI subsystem interface
 enum { pci_res_bus, pci_res_mem, pci_res_io, pci_res_max };
 
@@ -79,6 +81,7 @@ struct pci_bus {
 #define	PCI_MAPREG_IO_ADDR(reg) (reg & 0xFFFFFFFC)
 #define	PCI_MAPREG_IO_SIZE(reg) (PCI_MAPREG_IO_ADDR(reg) & -PCI_MAPREG_IO_ADDR(reg))
 
+void pci_func_enable(struct pci_func* f);
 void pciinit(void);
 
 #endif

@@ -5,12 +5,13 @@ X64 ?= yes
 BITS = 64
 XOBJS = kobj/vm64.o
 XFLAGS = -Werror -m64 -DX64 -mcmodel=kernel -mtls-direct-seg-refs -mno-red-zone
-LDFLAGS = -m elf_x86_64 -nodefaultlibs
+LDFLAGS = -m elf_x86_64 -z nodefaultlib
 QEMU ?= qemu-system-x86_64
 
 OPT ?= -O0
 
 OBJS := \
+	kobj/CXXInit.o\
 	kobj/bio.o\
 	kobj/ahci.o\
 	kobj/console.o\
@@ -43,6 +44,10 @@ OBJS := \
 	kobj/vga.o\
 	kobj/pci.o\
 	kobj/sysstring.o\
+	kobj/UNetworkAdapter.o\
+	kobj/UEtherFrame.o\
+	kobj/UProtocols.o\
+	kobj/USocket.o\
 	$(XOBJS)
 
 
@@ -64,7 +69,8 @@ endif
 
 # /usr/bin/x86_64-linux-gnu-gcc
 #x /usr/bin/86_64-linux-gnu-gcc-8
-CC = $(TOOLPREFIX)gcc
+CC = $(TOOLPREFIX)gcc-11
+CPP = $(TOOLPREFIX)g++-11
 AS = $(TOOLPREFIX)gas
 LD = $(TOOLPREFIX)ld
 OBJCOPY = $(TOOLPREFIX)objcopy
@@ -72,6 +78,7 @@ OBJDUMP = $(TOOLPREFIX)objdump
 CFLAGS = -fno-pic -static -fno-builtin -fno-strict-aliasing -Wall -MD -g -ggdb -fno-omit-frame-pointer
 CFLAGS += -ffreestanding -fno-common -nostdlib -Iinclude -gdwarf-2 $(XFLAGS) $(OPT)
 CFLAGS += $(shell $(CC) -fno-stack-protector -E -x c /dev/null >/dev/null 2>&1 && echo -fno-stack-protector)
+CCFLAGS = $(CFLAGS) -std=gnu++20 -fno-rtti -fno-use-cxa-atexit -fno-exceptions
 ASFLAGS = -fno-pic -gdwarf-2 -Wa,-divide -Iinclude $(XFLAGS)
 
 boot.img: out/bootblock out/kernel.elf fs.img
@@ -92,6 +99,10 @@ kobj/%.o: kernel/%.c
 	@mkdir -p kobj
 	$(CC) $(CFLAGS) -c -o $@ $<
 
+kobj/%.o: kernel/%.cc
+	@mkdir -p kobj
+	$(CPP) $(CCFLAGS) -c -o $@ $<
+
 kobj/fs/%.o: kernel/fs/%.c
 	@mkdir -p kobj/fs
 	$(CC) $(CFLAGS) -c -o $@ $<
@@ -105,9 +116,17 @@ uobj/%.o: user/%.c
 	@mkdir -p uobj
 	$(CC) $(CFLAGS) -c -o $@ $<
 
+uobj/%.o: user/%.cc
+	@mkdir -p uobj
+	$(CPP) $(CCFLAGS) -c -o $@ $<
+
 uobj/%.o: ulib/%.c
 	@mkdir -p uobj
 	$(CC) $(CFLAGS) -c -o $@ $<
+
+uobj/%.o: ulib/%.cc
+	@mkdir -p uobj
+	$(CPP) $(CCFLAGS) -c -o $@ $<
 
 uobj/unix/%.o: ulib/unix/%.c
 	@mkdir -p uobj/unix
@@ -131,7 +150,7 @@ out/bootblock: kernel/bootasm.S kernel/bootmain.c
 	@mkdir -p out
 	$(CC) -fno-builtin -fno-pic -m32 -nostdinc -Iinclude -O -o out/bootmain.o -g -c kernel/bootmain.c
 	$(CC) -fno-builtin -fno-pic -m32 -nostdinc -Iinclude -o out/bootasm.o -c kernel/bootasm.S
-	$(LD) -m elf_i386 -nodefaultlibs -N -e start -Ttext 0x7C00 -o out/bootblock.o out/bootasm.o out/bootmain.o
+	$(LD) -m elf_i386 -z nodefaultlib -N -e start -Ttext 0x7C00 -o out/bootblock.o out/bootasm.o out/bootmain.o
 	$(OBJDUMP) -S out/bootblock.o > out/bootblock.asm
 	$(OBJCOPY) -S -O binary -j .text out/bootblock.o out/bootblock
 	tools/sign.pl out/bootblock
@@ -219,6 +238,11 @@ UPROGS=\
 	fs/bin/stress\
 	fs/bin/wc\
 	fs/bin/reboot\
+	fs/bin/ip\
+	fs/bin/arping\
+	fs/bin/arp\
+	fs/bin/ping\
+	fs/bin/nc\
 
 fs/LICENSE: LICENSE
 	@mkdir -p fs
@@ -248,6 +272,7 @@ clean:
 	rm -rf out fs uobj kobj
 	rm -rf ./bin/*
 	rm -f kernel/vectors.S boot.img xv6memfs.img fs.img .gdbinit
+	rm -rf /tmp/loop
 	#put these back...
 	touch ./bin/.gitkeep
 	mkdir out

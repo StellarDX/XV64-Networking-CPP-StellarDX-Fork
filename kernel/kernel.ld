@@ -15,11 +15,22 @@ SECTIONS
 		*(.text .stub .text.* .gnu.linkonce.t.*)
 	}
 
+        . = ALIGN(0x1000);
+
 	PROVIDE(etext = .);	/* Define the 'etext' symbol to this value */
 
-	.rodata : {
-		*(.rodata .rodata.* .gnu.linkonce.r.*)
-	}
+        .rodata :
+        {
+            *(.ctors_begin)
+            *(.ctors)
+            *(.ctors_end)
+            *(.dtors_begin)
+            *(.dtors)
+            *(.dtors_end)
+            *(.rodata .rodata.* .gnu.linkonce.r.*)
+        }
+
+        . = ALIGN(0x1000);
 
 	/* Include debugging information in kernel memory */
 	.stab : {
@@ -29,6 +40,8 @@ SECTIONS
 		BYTE(0)		/* Force the linker to allocate space
 				   for this section */
 	}
+
+        . = ALIGN(0x1000);
 
 	.stabstr : {
 		PROVIDE(__STABSTR_BEGIN__ = .);
@@ -54,15 +67,21 @@ SECTIONS
 		*(.data)
 	}
 
+        . = ALIGN(0x1000);
+
 	PROVIDE(edata = .);
 
 	.bss : {
 		*(.bss)
 	}
 
+        . = ALIGN(0x1000);
+
 	PROVIDE(end = .);
 
 	/DISCARD/ : {
 		*(.eh_frame .note.GNU-stack)
 	}
+
+        . = ALIGN(0x1000);
 }

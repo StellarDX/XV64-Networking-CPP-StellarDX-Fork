@@ -7,6 +7,9 @@
 #include "x86.h"
 #include "syscall.h"
 
+#include "UProtocols.hh"
+#include "USocket.hh"
+
 // User code makes a system call with INT T_SYSCALL.
 // System call number in %eax.
 // Arguments on the stack, from the user call to the C
@@ -138,46 +141,66 @@ extern int sys_cpuhalt(void);
 extern int sys_getpriority(void);
 extern int sys_setpriority(void);
 
-static int (*syscalls[])(void) = {
-	[SYS_fork]          sys_fork,
-	[SYS_procexit]      sys_procexit,
-	[SYS_wait]          sys_wait,
-	[SYS_pipe]          sys_pipe,
-	[SYS_read]          sys_read,
-	[SYS_kill]          sys_kill,
-	[SYS_exec]          sys_exec,
-	[SYS_fstat]         sys_fstat,
-	[SYS_chdir]         sys_chdir,
-	[SYS_dup]           sys_dup,
-	[SYS_getpid]        sys_getpid,
-	[SYS_sbrk]          sys_sbrk,
-	[SYS_sleep]         sys_sleep,
-	[SYS_amblessed]     sys_amblessed,
-	[SYS_open]          sys_open,
-	[SYS_write]         sys_write,
-	[SYS_mknod]         sys_mknod,
-	[SYS_unlink]        sys_unlink,
-	[SYS_link]          sys_link,
-	[SYS_mkdir]         sys_mkdir,
-	[SYS_close]         sys_close,
-	[SYS_reboot]        sys_reboot,
-	[SYS_kconsole_info] sys_kconsole_info,
-	[SYS_seek]          sys_seek,
-	[SYS_getppid]       sys_getppid,
-	[SYS_bless]         sys_bless,
-	[SYS_damn]          sys_damn,
-	[SYS_isblessed]     sys_isblessed,
-	[SYS_bfork]         sys_bfork,
-	[SYS_mkvdev]        sys_mkvdev,
-	[SYS_pstate]        sys_pstate,
-	[SYS_pname]         sys_pname,
-	[SYS_ticks]         sys_ticks,
-	[SYS_halt]          sys_halt,
-	[SYS_info]          sys_info,
-	[SYS_nprocs]        sys_nprocs,
-	[SYS_cpuhalt]       sys_cpuhalt,
-	[SYS_getpriority]   sys_getpriority,
-	[SYS_setpriority]   sys_setpriority,
+static int (*syscalls[])(void) =
+{
+    [SYS_fork]          = sys_fork,
+    [SYS_procexit]      = sys_procexit,
+    [SYS_wait]          = sys_wait,
+    [SYS_pipe]          = sys_pipe,
+    [SYS_read]          = sys_read,
+    [SYS_kill]          = sys_kill,
+    [SYS_exec]          = sys_exec,
+    [SYS_fstat]         = sys_fstat,
+    [SYS_chdir]         = sys_chdir,
+    [SYS_dup]           = sys_dup,
+    [SYS_getpid]        = sys_getpid,
+    [SYS_sbrk]          = sys_sbrk,
+    [SYS_sleep]         = sys_sleep,
+    [SYS_amblessed]     = sys_amblessed,
+    [SYS_open]          = sys_open,
+    [SYS_write]         = sys_write,
+    [SYS_mknod]         = sys_mknod,
+    [SYS_unlink]        = sys_unlink,
+    [SYS_link]          = sys_link,
+    [SYS_mkdir]         = sys_mkdir,
+    [SYS_close]         = sys_close,
+    [SYS_reboot]        = sys_reboot,
+    [SYS_kconsole_info] = sys_kconsole_info,
+    [SYS_seek]          = sys_seek,
+    [SYS_getppid]       = sys_getppid,
+    [SYS_bless]         = sys_bless,
+    [SYS_damn]          = sys_damn,
+    [SYS_isblessed]     = sys_isblessed,
+    [SYS_bfork]         = sys_bfork,
+    [SYS_mkvdev]        = sys_mkvdev,
+    [SYS_pstate]        = sys_pstate,
+    [SYS_pname]         = sys_pname,
+    [SYS_ticks]         = sys_ticks,
+    [SYS_halt]          = sys_halt,
+    [SYS_info]          = sys_info,
+    [SYS_nprocs]        = sys_nprocs,
+    [SYS_cpuhalt]       = sys_cpuhalt,
+    [SYS_getpriority]   = sys_getpriority,
+    [SYS_setpriority]   = sys_setpriority,
+
+    [SYS_ARPRequest]    = INet_ARPRequest,
+    [SYS_SetIPAddress]  = INet_SetIPAddress,
+    [SYS_ShowIPAddress] = INet_ShowIPAddress,
+    [SYS_PrintARPTable] = INet_PrintARPTable,
+    [SYS_DelIPAddress]  = INet_DelIPAddress,
+    [SYS_RTAddStatic]   = INet_RTAddStatic,
+    [SYS_RTPrint]       = INet_RTPrint,
+    [SYS_RTDelete]      = INet_RTDelete,
+    [SYS_Ping]          = INet_Ping,
+
+    [SYS_socket]        = SOC_CreateSocket,
+    [SYS_bind]          = SOC_BindSocket,
+    [SYS_listen]        = SOC_SocketStartListen,
+    [SYS_accept]        = SOC_SocketAccept,
+    [SYS_socksend]      = SOC_SocketWrite,
+    [SYS_sockrecv]      = SOC_SocketRead,
+    [SYS_sockrecvfrom]  = SOC_SocketReceiveFrom,
+    [SYS_socksendto]    = SOC_SocketSendTo
 };
 
 void syscall(void){
