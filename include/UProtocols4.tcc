@@ -408,8 +408,8 @@ private:
         WORD  UrgentPointer;
     }CurrentSegment;// __declspec(deprecated);
 
-    //LinkedQueue<TCP<4>> TransmitQueue;
-    LinkedQueue<TCB<4>*> ReceiveQueue;
+    //LinkedQueue<TCP<Version>> TransmitQueue;
+    LinkedQueue<TCB<Version>*> ReceiveQueue;
 
 public:
     TCB() {Init();}
