@@ -1,3 +1,36 @@
+<h1>尝试用C++在XV64上实现IPS（TCP/IP）协议栈</h1>
+
+<i>被你发现了</i>
+
+<p>原版那个Readme说需要Docker，经测试发现只需要GCC 11和QEMU就可以编译运行，不用Docker。顺带纠正了makefile里面的几个小错误</p>
+<p>这一次我决定一反常态的尝试在XV64这个使用C语言编写的操作系统上用C++编写其中一个模块，当然过程肯定不能说一帆风顺，但是至少达成了一个目的——证明这是可行的。</p>
+
+<h2>新增的功能</h2>
+<ul>
+	<li>英特尔8254（E1000）的网卡驱动</li>
+	<li>ARP（含协议报文，ARP表和ARPing）</li>
+	<li>IPv4（含协议报文，地址表和路由表）</li>
+	<li>ICMP和ping</li>
+	<li>TCP和TCB*</li>
+	<li>UDP*</li>
+	<li>巨™简单的Socket+nc命令（。。。）</li>
+</ul>
+<i>*注：TCP和UDP目前只支持从外部主机接收数据（我也弄不明白为何带数据的TCP和UDP报文校验和老算错）。</i>
+
+<h2>预留的结构</h2>
+<ul>
+	<li>IPv6</li>
+	<li>ICMPv6</li>
+</ul>
+
+<p>具体怎么实现的参考这里：<a href="https://github.com/pandax381/xv6-net">xv6-net</a></p>
+
+<h3>以下为XV64原版readme</h3>
+
+----------
+
+<div class="Original">
+
 # Xv64
 
 Xv64 is a 64-bit operating system targeting AMD64 compatible processors, featuring an SMP hybrid microkernel, POSIX/UNIX compatibility layer, AHCI/SATA support, & much more. The goal of Xv64 is to implement a clean, modern, 64-bit only OS that can both maintain a POSIX compatibility layer while also exploring unique OS design concepts.
@@ -55,3 +88,5 @@ merged from work done by Brian Swetland.
 ## License
 
 This open-source software is licensed under the terms in the included [LICENSE](LICENSE)  file.
+
+</div>
