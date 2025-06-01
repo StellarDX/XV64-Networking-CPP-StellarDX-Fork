@@ -23,3 +23,6 @@ fs/**/*
 *.cxxflags
 *.files
 *.includes
+
+# README
+README.md
