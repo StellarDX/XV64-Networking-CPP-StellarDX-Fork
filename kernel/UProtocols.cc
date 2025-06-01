@@ -196,10 +196,18 @@ int ARP::Tester::ARPing(DWORD TargetIPAddress)
     decltype(IPv4::AdapterIPAddressTable)::iterator SenderAddress;
     NetworkAdapter* Device;
     Route = IPv4::RouteTableMatch(TargetIPAddress);
-    if (Route == IPv4::RouteTable.end()) {goto EndTesting;}
+    if (Route == IPv4::RouteTable.end())
+    {
+        ReturnVal = IPNotFound;
+        goto EndTesting;
+    }
     Device = Route->Iface;
     SenderAddress = IPv4::IPFind(Device);
-    if (SenderAddress == IPv4::AdapterIPAddressTable.end()) {goto EndTesting;}
+    if (SenderAddress == IPv4::AdapterIPAddressTable.end())
+    {
+        ReturnVal = IPNotFound;
+        goto EndTesting;
+    }
 
     // Prepare
     ARPFrame->Prepare(ARP::Request);
@@ -237,7 +245,7 @@ int ARP::Tester::ARPing(DWORD TargetIPAddress)
 
     if (ReturnVal == IPNotFound)
     {
-        cprintf ((char*)"Local machine has no available IP address.\n");
+        cprintf((char*)"Network is unreachable.\n");
         return ReturnVal;
     }
 
@@ -1020,8 +1028,12 @@ namespace ICMPControllers
                 TargetIP[0], TargetIP[1], TargetIP[2], TargetIP[3]);
         cprintf((char*)"%d packets transmitted, %d packets received, %d% unanswered\n",
                 PingSent, PingReceived, UnAns > 100 ? 100 : UnAns);*/
-        cprintf((char*)"Success rate is %d percent (%d/%d)\n",
+        if (!PingSent) {cprintf((char*)"Network is unreachable.\n");}
+        else
+        {
+            cprintf((char*)"Success rate is %d percent (%d/%d)\n",
                 (PingReceived * 100) / (PingSent), PingReceived, PingSent);
+        }
 
         IsTesting = 0;
         IsReceived = 0;
